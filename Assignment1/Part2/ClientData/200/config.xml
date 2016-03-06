@@ -1,0 +1,44 @@
+<?xml version="1.0"?><tsung loglevel="notice" version="1.0">
+
+<clients>
+    	<client host="localhost" maxusers="10000" use_controller_vm="true"/>
+</clients>
+
+<servers>
+    	<server host="server-ip" port="80" type="tcp"/>
+</servers>
+
+<load duration="120" unit="second">
+<arrivalphase phase="1" duration="120" unit="second">
+    	<users maxnumber="200" arrivalrate="200" unit="second"/>
+</arrivalphase>
+</load>
+
+<options>
+<option type="ts_http" name="user_agent">
+    	<user_agent probability="100">Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0</user_agent>
+</option>
+<option name="thinktime" value="3" random="true" override="true"/>
+</options>
+
+<sessions>
+
+    	<session probability="100" name="login" type="ts_http">
+
+     	<for from="1" to="2000000" var="i">
+
+
+    	<transaction name="loginURL">
+    	<request subst="true">
+            	<http url="http://10.5.64.78/test.php" version="1.1">
+            	<http_header name="Cache-Control" value="no-cache"/></http>
+    	</request>
+    	</transaction>
+
+    	<thinktime value="3" random="true"/>
+
+    	</for>
+
+    	</session>
+</sessions>
+</tsung>
