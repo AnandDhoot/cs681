@@ -29,9 +29,5 @@ public:
 		jobDead = false;
 	}
 
-	bool operator==(const jobs& b)
-	{
-		return this->id == b.id;
-	}
 };
 
