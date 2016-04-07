@@ -22,25 +22,16 @@ void set_new_lambda(std::exponential_distribution<T> *exp_dis, T val)
 }
 // --------------- </UTILS> ---------------
 
-
-jobs getNewJob()
-{
-	int jobdur = (int) jobDuration(generator);
-	int deadline = currTime + jobdur + (int) jobSlack(generator);
-	jobs j(jobdur, deadline, currTime);
-
-	cout << "New job: " << j.id << " " << jobdur << " " << deadline << " " << currTime << endl;
-	return j;
-}
-
-vector<jobs> serverBuffer;
+vector<jobs> jobBuffer;
 vector<Client*> requestBuffer;
 Client *client[NUM_CLIENTS];
 void init()
 {
 	//initilize eventlist
-	jobArrival x(jobArr(generator), getNewJob());
+	eventList.push_back(new jobArrival( jobArr(generator), getNewJob()));
+	eventList.push_back(new serverInterrupt(2));
 	for(int i=0;i<NUM_CLIENTS;i++){
+		client[i]=new fifoRRClient(1);
 		eventList.push_back(new timerInterrupt(client[i],1));
 	}
 
@@ -58,12 +49,13 @@ int main()
 	{
 		c[i] = new fifoClient((int) clientSpeed(generator));
 	}
-
-	for(int i=0; i<10; i++)
-	{
-		getNewJob();
+	init();
+	int enthu=100;
+	while(enthu){
+		eventList.front()->handle();
+		eventList.pop_front();
+		enthu--;
 	}
 
-
-
+	return 1;
 }

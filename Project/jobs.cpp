@@ -31,7 +31,7 @@ public:
 
 	jobs()
 	{
-		id = jobCount ++;
+		id = -1;
 		timeNeeded = -1;
 		runTime = -1;
 		deadline = -1;

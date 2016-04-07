@@ -13,6 +13,7 @@ class Client
 {
 public:
 	int id;
+		int outReq=0;
 	int speed;
 	list<jobs> buffer;
 	jobs *current;

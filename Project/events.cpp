@@ -4,44 +4,42 @@
 
 #include "client.cpp"
 #define NUM_CLIENTS 5
-
+#define NUM_JOBS 5
+#define CLIENT_BUFFER 5
 using namespace std;
 
 class event;
 
 int currTime = 1;
 list<event*> eventList;
-extern vector<jobs> serverBuffer;
+extern vector<jobs> jobBuffer;
+extern default_random_engine generator;
 extern vector<Client*> requestBuffer;
-
+extern exponential_distribution<double> jobDuration;
+extern exponential_distribution<double> jobSlack;
+extern exponential_distribution<double> jobArr;
 class event{
 public:
 	int eventServiceTime; 	// timestamp
-	virtual void handle(vector<event*> eventList) = 0;	
+	virtual void handle() {}	
 };
 class serverInterrupt : public event {
 public:
-	Client *c;
-	serverInterrupt(Client* cl,int time){
-		c=cl;
+	serverInterrupt(int time){
 		eventServiceTime=time;
 
 	}
-	void handle(vector<event*> eventList)
+	void handle()
 	{
-	// 	currTime = eventServiceTime;
+		//some algo 
+		eventList.push_back(new serverInterrupt(eventServiceTime + 2));
+		if(jobBuffer.size()==0||requestBuffer.size()==0)
+			return;
+		requestBuffer[0]->buffer.push_back(jobBuffer[0]);
+		requestBuffer[0]->outReq--;
+		requestBuffer.erase(requestBuffer.begin());
+		jobBuffer.erase(jobBuffer.begin());
 
-	// 	c->current->runTime += c->speed;
-	// 	if(c->current->runTime >= c->current->timeNeeded)
-	// 	{
-	// 		// Job complete 
-	// 		c->removeJob(*(c->current));
-	// 		serverBuffer.push_back(c);
-	// 	}
-	// 	*(c->current) = c->getNextJob();
-
-	// 	// add new timerInterrupt
-	// 	eventList.push_back(new serverInterrupt(c, eventServiceTime + 1));
 	}
 
 };
@@ -52,25 +50,40 @@ public:
 		c=cl;
 		eventServiceTime = tim;
 	}
-	void handle(vector<event*> eventList)
+	void handle()
 	{
+		// cerr << "Serving timerInterrupt" << endl;
 		currTime = eventServiceTime;
 
-		c->current->runTime += c->speed;
+		if(c->current!=NULL){
+					c->current->runTime += c->speed;
 		if(c->current->runTime >= c->current->timeNeeded)
 		{
 			// Job complete 
+			cout<<"YO"<<endl;
 			c->removeJob(*(c->current));
-			requestBuffer.push_back(c);
 		}
+		for(int i=0;CLIENT_BUFFER-c->outReq>0;i++){
+				requestBuffer.push_back(c);
+				c->outReq++;
+			}
+	  }
 		*(c->current) = c->getNextJob();
 
 		// add new timerInterrupt
-		timerInterrupt ti(c, eventServiceTime + 1);
-		eventList.push_back(&ti);
+		eventList.push_back(new timerInterrupt(c, eventServiceTime + 1));
 	}
 
 };
+jobs getNewJob()
+{
+	int jobdur = (int) jobDuration(generator);
+	int deadline = currTime + jobdur + (int) jobSlack(generator);
+	jobs j(jobdur, deadline, currTime);
+
+	cout << "New job: " << j.id << " " << jobdur << " " << deadline << " " << currTime << endl;
+	return j;
+}
 
 class jobArrival : public event {
 public:
@@ -79,11 +92,16 @@ public:
 		job = x;
 		eventServiceTime = time;
 	}
-	void handle (vector<event*> eventList)
+	void handle ()
 	{
+		// cerr << "Serving jobArrival" << endl;
 		// add job to server buffer
+		if(jobBuffer.size()<NUM_JOBS){
+			jobBuffer.push_back(job);
+			eventList.push_back(new jobArrival( jobArr(generator), getNewJob()));
+		}
 		// enqueue next job arrival event after calling expon
-
+		// cerr << "End\n";
 	}
 
 };
