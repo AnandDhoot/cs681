@@ -7,31 +7,36 @@
 using namespace std;
 
 int currTime = 1;
+list<event*> des;
 
 class event{
 public:
-	int timeStamp;
+	int eventServiceTime; 	// timestamp
 	virtual void handle(vector<event*> eventList) = 0;	
 };
 
 class timerInterrupt : public event {
 public:
 	Client *c;
-	void handle(vector<event*> eventList)
+
+	void handle()
 	{
+		currTime = eventServiceTime;
+
 		c->current->runTime += c->speed;
 		if(c->current->runTime >= c->current->timeNeeded)
 		{
-			//print trace
+			// Job complete 
 			c->removeJob(*(c->current));
-			//request server for new job
+			serverBuffer.push_back(c);
 		}
 		*(c->current) = c->getNextJob();
-		//add new timerInterrupt
-		timerInterrupt new1;
-		new1.timeStamp=timeStamp+1;
-		new1.c = c;
-		eventList.push_back(&new1);
+
+		// add new timerInterrupt
+		timerInterrupt ti;
+		ti.eventServiceTime = eventServiceTime + 1;
+		ti.c = c;
+		des.push_back(&ti);
 	}
 
 };
@@ -43,7 +48,7 @@ class jobArrival : public event {
 	void handle (vector<event*> eventList)
 	{
 		// add job to server buffer
-		//enqueue next job arrival event after calling expon
+		// enqueue next job arrival event after calling expon
 
 	}
 

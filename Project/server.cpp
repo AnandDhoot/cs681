@@ -9,7 +9,7 @@ using namespace std;
 #define NUM_CLIENTS 5
 
 // --------------- <UTILS> ----------------
-// Exponential random number genrator recepie
+// Exponential random number genrator receipe
 default_random_engine generator;
 exponential_distribution<double> jobDuration;
 exponential_distribution<double> jobSlack;
