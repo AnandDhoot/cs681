@@ -29,6 +29,16 @@ public:
 		jobDead = false;
 	}
 
+	jobs()
+	{
+		id = jobCount ++;
+		timeNeeded = -1;
+		runTime = -1;
+		deadline = -1;
+		spawnTime = -1;
+		jobDead = true;
+	}
+
 	bool operator==(const jobs& b)
 	{
 		return this->id == b.id;

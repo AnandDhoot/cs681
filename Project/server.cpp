@@ -6,13 +6,12 @@
 
 using namespace std;
 
-#define NUM_CLIENTS 5
-
 // --------------- <UTILS> ----------------
 // Exponential random number genrator receipe
 default_random_engine generator;
 exponential_distribution<double> jobDuration;
 exponential_distribution<double> jobSlack;
+exponential_distribution<double> jobArr;
 
 // To reset the exponential paramter
 template<typename T>
@@ -34,12 +33,24 @@ jobs getNewJob()
 	return j;
 }
 
+vector<jobs> serverBuffer;
+vector<Client*> requestBuffer;
+Client *client[NUM_CLIENTS];
+void init()
+{
+	//initilize eventlist
+	jobArrival x(jobArr(generator), getNewJob());
+	for(int i=0;i<NUM_CLIENTS;i++){
+		eventList.push_back(new timerInterrupt(client[i],1));
+	}
 
+}
 int main()
 {
 	// init all the stuff
 	set_new_lambda(&jobDuration, 0.5);
 	set_new_lambda(&jobSlack, 0.25);
+	set_new_lambda(&jobArr, 10.0);
 	set_new_lambda(&clientSpeed, 0.1);
 
 	Client *c[5];
