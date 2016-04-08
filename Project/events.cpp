@@ -52,7 +52,7 @@ public:
 		eventList.sort(PComp<event>);
 
 		//cout<<"serverInterrupt "<<jobBuffer.size()<<" "<<requestBuffer.size()<<endl;
-		while(requestBuffer[0]->buffer.size()>=CLIENT_BUFFER&&requestBuffer.size()!=0){
+		while(requestBuffer[0]->buffer.size()>=CLIENT_BUFFER && requestBuffer.size()!=0){
 			requestBuffer[0]->outReq--;
 			requestBuffer.erase(requestBuffer.begin());
 		}
@@ -96,9 +96,9 @@ public:
 					cpuWaste+=c->current->runTime;
 			}
 			else
-			c->buffer.push_back(*c->current);
+			c->buffer.push_back(*(c->current));
 		}
-		for(int i=0;CLIENT_BUFFER-c->outReq>0;i++){
+		for(int i=0;CLIENT_BUFFER - c->outReq - c->buffer.size() >0;i++){
 			if(requestBuffer.size()>=SERVER_BUFFER)
 				break;
 			requestBuffer.push_back(c);

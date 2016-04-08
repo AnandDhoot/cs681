@@ -55,7 +55,7 @@ default_random_engine generator (seed);
 	set_new_lambda(&clientSpeed, 0.1);
 
 	init();
-	int enthu=10000;
+	int enthu=1000;
 	while(enthu){
 		eventList.front()->handle();
 		eventList.pop_front();
