@@ -43,7 +43,6 @@ public:
 		if(buffer.size()>0){
 		jobs temp = buffer.front();
 		buffer.pop_front();
-		buffer.push_back(temp);
 		return temp;}
 
 	}

@@ -78,10 +78,11 @@ public:
 	{
 		currTime = eventServiceTime;
 		// cerr << fixed << setprecision(2) << currTime << " Serving timerInterrupt " 
-		// 		<< c->id << " " << c->outReq << " " << c->current->id << endl;
+			//cout<< c->id << " " << c->outReq<< " "<<c->buffer.size() << " " << c->current->id<<" "<<c->current->timeNeeded- c->current->runTime << endl;
 
 		if(c->current->id!=-1){
 			c->current->runTime += c->speed;
+
 			if(c->current->runTime >= c->current->timeNeeded)
 			{
 				// Job complete 
@@ -94,6 +95,7 @@ public:
 				if(currTime-c->current->deadline<0)
 					cpuWaste+=c->current->runTime;
 			}
+			c->buffer.push_back(*c->current);
 		}
 		for(int i=0;CLIENT_BUFFER-c->outReq>0;i++){
 			if(requestBuffer.size()>=SERVER_BUFFER)
