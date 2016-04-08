@@ -19,7 +19,9 @@ extern vector<Client*> requestBuffer;		// Server request buffer
 extern exponential_distribution<double> jobDuration;
 extern exponential_distribution<double> jobSlack;
 extern exponential_distribution<double> jobArr;
-
+extern int jobsCompleted;
+extern double deadlineSlack;
+extern double cpuWaste,cpuIdle;
 template <typename T> bool PComp(const T * const & a, const T * const & b)
 {
    return *a < *b;
@@ -78,6 +80,10 @@ public:
 				// Job complete 
 				cout<< fixed << setprecision(2) << currTime << " JobDoneAtClient " << c->current->id << " " << c->id <<endl;
 				c->removeJob(*(c->current));
+				jobsCompleted++;
+				deadlineSlack += currTime-c->current->deadline;
+				if(currTime-c->current->deadline<0)
+					cpuWaste+=c->current->runTime;
 			}
 		}
 		for(int i=0;CLIENT_BUFFER-c->outReq>0;i++){
@@ -86,6 +92,9 @@ public:
 			}
 		if(c->buffer.size()>0)
 			*(c->current) = c->getNextJob();
+		else
+			cpuIdle+=c->speed;
+
 
 		// add new timerInterrupt
 		eventList.push_back(new timerInterrupt(c, eventServiceTime + 1.0));

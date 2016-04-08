@@ -12,6 +12,9 @@ default_random_engine generator;
 exponential_distribution<double> jobDuration;
 exponential_distribution<double> jobSlack;
 exponential_distribution<double> jobArr;
+int jobsCompleted=0;
+double deadlineSlack=0;
+double cpuWaste=0,cpuIdle=0;
 
 // To reset the exponential paramter
 template<typename T>
@@ -45,18 +48,17 @@ int main()
 	set_new_lambda(&jobArr, 10.0);
 	set_new_lambda(&clientSpeed, 0.1);
 
-	// Client *c[5];
-	// for(int i=0; i<5; i++)
-	// {
-	// 	c[i] = new fifoClient((int) clientSpeed(generator));
-	// }
 	init();
-	int enthu=100;
+	int enthu=10000;
 	while(enthu){
 		eventList.front()->handle();
 		eventList.pop_front();
 		enthu--;
 	}
-
+	cout<<"# Jobs Completed : "<<jobsCompleted<<endl;
+	cout<<"# Deadline Slack : "<<deadlineSlack<<endl;
+	cout<<"# CPU Cycles Wasted : "<<cpuWaste<<endl;
+	cout<<"# CPU Cycles Idle : "<<cpuIdle<<endl;
+	cout<<"# Total Time elapsed : "<<currTime<<endl;
 	return 1;
 }
