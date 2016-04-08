@@ -13,7 +13,7 @@ class Client
 {
 public:
 	int id;
-		int outReq=0;
+	int outReq=0;
 	int speed;
 	list<jobs> buffer;
 	jobs *current;
@@ -36,7 +36,7 @@ class fifoRRClient : public Client{
 public:
 	fifoRRClient(int s) : Client(s)
 	{
-
+		cout << "NewClient " << "fifoRR " << id << " " << speed << endl;
 	}
 	jobs getNextJob()
 	{
@@ -52,7 +52,7 @@ class fifoClient : public Client{
 public:
 	fifoClient(int s) : Client(s)
 	{
-		
+		cout << "NewClient " << "fifo " << id << " " << speed << endl;
 	}
 	jobs getNextJob()
 	{

@@ -28,12 +28,13 @@ Client *client[NUM_CLIENTS];
 void init()
 {
 	//initilize eventlist
-	eventList.push_back(new jobArrival( jobArr(generator), getNewJob()));
+	eventList.push_back(new jobArrival(getNewJob(), jobArr(generator)));
 	eventList.push_back(new serverInterrupt(2));
 	for(int i=0;i<NUM_CLIENTS;i++){
-		client[i]=new fifoRRClient(1);
+		client[i]=new fifoRRClient(1 + clientSpeed(generator)); 	// 1 to ensure speed is never 0. 
 		eventList.push_back(new timerInterrupt(client[i],1));
 	}
+	eventList.sort(PComp<event>);
 
 }
 int main()
@@ -44,11 +45,11 @@ int main()
 	set_new_lambda(&jobArr, 10.0);
 	set_new_lambda(&clientSpeed, 0.1);
 
-	Client *c[5];
-	for(int i=0; i<5; i++)
-	{
-		c[i] = new fifoClient((int) clientSpeed(generator));
-	}
+	// Client *c[5];
+	// for(int i=0; i<5; i++)
+	// {
+	// 	c[i] = new fifoClient((int) clientSpeed(generator));
+	// }
 	init();
 	int enthu=100;
 	while(enthu){

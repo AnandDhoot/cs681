@@ -13,18 +13,18 @@ static int jobCount = 0;
 class jobs{
 public:
 	int id;
-	int timeNeeded;		// Difference
-	int runTime;		// Difference
-	int deadline;		// Absolute
-	int spawnTime;		// Absolute
+	double timeNeeded;		// Difference
+	double runTime;			// Difference
+	double deadline;		// Absolute
+	double spawnTime;		// Absolute, the time when job was added to server buffer
 	bool jobDead;
 
-	jobs(int tn, int dl, int st)
+	jobs(double tn, double dl)
 	{
 		id = jobCount ++;
 		timeNeeded = tn;
 		deadline = dl;
-		spawnTime = st;
+		spawnTime = -1; // Set later in interrupt
 		runTime = 0;
 		jobDead = false;
 	}

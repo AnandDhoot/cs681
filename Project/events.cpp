@@ -1,105 +1,126 @@
 #include <vector> 
 #include <list> 
 #include <iostream>
+#include <iomanip>
 
 #include "client.cpp"
 #define NUM_CLIENTS 5
-#define NUM_JOBS 5
+#define NUM_JOBS 50
 #define CLIENT_BUFFER 5
 using namespace std;
 
 class event;
 
-int currTime = 1;
+double currTime = 0;
 list<event*> eventList;
 extern vector<jobs> jobBuffer;
 extern default_random_engine generator;
-extern vector<Client*> requestBuffer;
+extern vector<Client*> requestBuffer;		// Server request buffer
 extern exponential_distribution<double> jobDuration;
 extern exponential_distribution<double> jobSlack;
 extern exponential_distribution<double> jobArr;
+
+template <typename T> bool PComp(const T * const & a, const T * const & b)
+{
+   return *a < *b;
+}
+
 class event{
 public:
-	int eventServiceTime; 	// timestamp
+	double eventServiceTime; 	// timestamp
 	virtual void handle() {}	
+
+	bool operator<(const event& right) const 
+	{ return eventServiceTime < right.eventServiceTime; }
 };
 class serverInterrupt : public event {
 public:
-	serverInterrupt(int time){
+	serverInterrupt(double time){
 		eventServiceTime=time;
 
 	}
 	void handle()
 	{
+		currTime = eventServiceTime;
+		// cerr << fixed << setprecision(2) << currTime << " Serving serverInterrupt" << endl;
 		//some algo 
-		eventList.push_back(new serverInterrupt(eventServiceTime + 2));
+		eventList.push_back(new serverInterrupt(eventServiceTime + 0.1));
+		eventList.sort(PComp<event>);
+
 		if(jobBuffer.size()==0||requestBuffer.size()==0)
 			return;
+
+		cout << fixed << setprecision(2) << currTime << " JobToClient " << jobBuffer[0].id << " " << requestBuffer[0]->id << endl;
 		requestBuffer[0]->buffer.push_back(jobBuffer[0]);
 		requestBuffer[0]->outReq--;
 		requestBuffer.erase(requestBuffer.begin());
 		jobBuffer.erase(jobBuffer.begin());
-
 	}
 
 };
 class timerInterrupt : public event {
 public:
 	Client *c;
-	timerInterrupt(Client* cl,int tim){
+	timerInterrupt(Client* cl,double tim){
 		c=cl;
 		eventServiceTime = tim;
 	}
 	void handle()
 	{
-		// cerr << "Serving timerInterrupt" << endl;
 		currTime = eventServiceTime;
+		// cerr << fixed << setprecision(2) << currTime << " Serving timerInterrupt " 
+		// 		<< c->id << " " << c->outReq << " " << c->current->id << endl;
 
 		if(c->current->id!=-1){
-					c->current->runTime += c->speed;
-		if(c->current->runTime >= c->current->timeNeeded)
-		{
-			// Job complete 
-			cout<<"Job Complete"<<c->current->id<<endl;
-			c->removeJob(*(c->current));
+			c->current->runTime += c->speed;
+			if(c->current->runTime >= c->current->timeNeeded)
+			{
+				// Job complete 
+				cout<< fixed << setprecision(2) << currTime << " JobDoneAtClient " << c->current->id << " " << c->id <<endl;
+				c->removeJob(*(c->current));
+			}
 		}
-	}
 		for(int i=0;CLIENT_BUFFER-c->outReq>0;i++){
 				requestBuffer.push_back(c);
 				c->outReq++;
 			}
-	  if(c->buffer.size()>0)
-		*(c->current) = c->getNextJob();
+		if(c->buffer.size()>0)
+			*(c->current) = c->getNextJob();
 
 		// add new timerInterrupt
-		eventList.push_back(new timerInterrupt(c, eventServiceTime + 1));
+		eventList.push_back(new timerInterrupt(c, eventServiceTime + 1.0));
+		eventList.sort(PComp<event>);
 	}
 
 };
 jobs getNewJob()
 {
-	int jobdur = (int) jobDuration(generator);
-	int deadline = currTime + jobdur + (int) jobSlack(generator);
-	jobs j(jobdur, deadline, currTime);
+	double jobdur = jobDuration(generator);
+	double deadline = currTime + jobdur + jobSlack(generator);
+	jobs j(jobdur, deadline);
 
-	cout << "New job: " << j.id << " " << jobdur << " " << deadline << " " << currTime << endl;
 	return j;
 }
 
 class jobArrival : public event {
 public:
 	jobs job;
-	jobArrival(int time,jobs x){
+	jobArrival(jobs x, double time){
 		job = x;
 		eventServiceTime = time;
 	}
 	void handle ()
 	{
-		// cerr << "Serving jobArrival" << endl;
+		currTime = eventServiceTime;
+		// cerr << fixed << setprecision(2) << currTime << " Serving jobArrival " << job.id << endl;
 		// add job to server buffer
 		if(jobBuffer.size()<NUM_JOBS){
+			job.spawnTime = currTime;
 			jobBuffer.push_back(job);
-			eventList.push_back(new jobArrival( currTime+ jobArr(generator), getNewJob()));
+			cout << fixed << setprecision(2) << currTime << " NewJobAtServer " << job.id << " " << job.timeNeeded 
+					<< " " << job.deadline << " " << job.spawnTime << endl;
+			eventList.push_back(new jobArrival(getNewJob(), currTime + jobArr(generator)));
+			eventList.sort(PComp<event>);
 		}
 		// enqueue next job arrival event after calling expon
 		// cerr << "End\n";
