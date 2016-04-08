@@ -80,6 +80,7 @@ public:
 				// Job complete 
 				cout<< fixed << setprecision(2) << currTime << " JobDoneAtClient " << c->current->id << " " << c->id <<endl;
 				c->removeJob(*(c->current));
+				c->current->id = -1;
 				jobsCompleted++;
 				deadlineSlack += currTime-c->current->deadline;
 				if(currTime-c->current->deadline<0)

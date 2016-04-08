@@ -1,4 +1,6 @@
 #include <vector> 
+#include <chrono> 
+#include <random>
 #include <list> 
 #include <iostream>
 
@@ -8,7 +10,8 @@ using namespace std;
 
 // --------------- <UTILS> ----------------
 // Exponential random number genrator receipe
-default_random_engine generator;
+unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+default_random_engine generator (seed);
 exponential_distribution<double> jobDuration;
 exponential_distribution<double> jobSlack;
 exponential_distribution<double> jobArr;
