@@ -49,6 +49,9 @@ public:
 		eventList.push_back(new serverInterrupt(eventServiceTime + 0.1));
 		eventList.sort(PComp<event>);
 
+		while(requestBuffer[0]->buffer.size()>=CLIENT_BUFFER&&requestBuffer.size()!=0)
+			requestBuffer.erase(requestBuffer.begin());
+		//cout<<"serverInterrupt "<<jobBuffer.size()<<" "<<requestBuffer.size()<<endl;
 		if(jobBuffer.size()==0||requestBuffer.size()==0)
 			return;
 

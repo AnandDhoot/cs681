@@ -1,7 +1,8 @@
 #include <vector> 
 #include <list> 
 #include <iostream>
-
+#include <chrono> 
+#include <random>
 #include "events.cpp"
 
 using namespace std;
@@ -43,6 +44,8 @@ void init()
 int main()
 {
 	// init all the stuff
+unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+default_random_engine generator (seed);
 	set_new_lambda(&jobDuration, 0.5);
 	set_new_lambda(&jobSlack, 0.25);
 	set_new_lambda(&jobArr, 10.0);
