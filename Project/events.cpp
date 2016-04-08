@@ -7,7 +7,7 @@
 #define NUM_CLIENTS 5
 #define NUM_JOBS 50
 #define CLIENT_BUFFER 5
-#define SERVER_BUFFER 10
+#define SERVER_BUFFER 25
 using namespace std;
 
 class event;
@@ -51,9 +51,11 @@ public:
 		eventList.push_back(new serverInterrupt(eventServiceTime + 0.1));
 		eventList.sort(PComp<event>);
 
-		while(requestBuffer[0]->buffer.size()>=CLIENT_BUFFER&&requestBuffer.size()!=0)
-			requestBuffer.erase(requestBuffer.begin());
 		//cout<<"serverInterrupt "<<jobBuffer.size()<<" "<<requestBuffer.size()<<endl;
+		while(requestBuffer[0]->buffer.size()>=CLIENT_BUFFER&&requestBuffer.size()!=0){
+			requestBuffer[0]->outReq--;
+			requestBuffer.erase(requestBuffer.begin());
+		}
 		if(jobBuffer.size()==0||requestBuffer.size()==0)
 			return;
 
@@ -94,9 +96,11 @@ public:
 			}
 		}
 		for(int i=0;CLIENT_BUFFER-c->outReq>0;i++){
-			if(requestBuffer.size()>=SERVER_BUFFER)break;
-				requestBuffer.push_back(c);
-				c->outReq++;
+			if(requestBuffer.size()>=SERVER_BUFFER)
+				break;
+			requestBuffer.push_back(c);
+			c->outReq++;
+				//cout<<"clientshizz "<<requestBuffer.size();
 			}
 		if(c->buffer.size()>0)
 			*(c->current) = c->getNextJob();
@@ -136,9 +140,9 @@ public:
 			jobBuffer.push_back(job);
 			cout << fixed << setprecision(2) << currTime << " NewJobAtServer " << job.id << " " << job.timeNeeded 
 					<< " " << job.deadline << " " << job.spawnTime << endl;
+		}
 			eventList.push_back(new jobArrival(getNewJob(), currTime + jobArr(generator)));
 			eventList.sort(PComp<event>);
-		}
 		// enqueue next job arrival event after calling expon
 		// cerr << "End\n";
 	}
