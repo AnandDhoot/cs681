@@ -22,7 +22,7 @@ public:
 	{
 		id = clientCount ++;
 		speed = s;
-		current = NULL;
+		current = new jobs();
 	}
 
 	virtual jobs getNextJob() = 0;	
@@ -40,10 +40,11 @@ public:
 	}
 	jobs getNextJob()
 	{
+		if(buffer.size()>0){
 		jobs temp = buffer.front();
 		buffer.pop_front();
 		buffer.push_back(temp);
-		return temp;
+		return temp;}
 
 	}
 };

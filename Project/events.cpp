@@ -55,19 +55,20 @@ public:
 		// cerr << "Serving timerInterrupt" << endl;
 		currTime = eventServiceTime;
 
-		if(c->current!=NULL){
+		if(c->current->id!=-1){
 					c->current->runTime += c->speed;
 		if(c->current->runTime >= c->current->timeNeeded)
 		{
 			// Job complete 
-			cout<<"YO"<<endl;
+			cout<<"Job Complete"<<c->current->id<<endl;
 			c->removeJob(*(c->current));
 		}
+	}
 		for(int i=0;CLIENT_BUFFER-c->outReq>0;i++){
 				requestBuffer.push_back(c);
 				c->outReq++;
 			}
-	  }
+	  if(c->buffer.size()>0)
 		*(c->current) = c->getNextJob();
 
 		// add new timerInterrupt
@@ -98,7 +99,7 @@ public:
 		// add job to server buffer
 		if(jobBuffer.size()<NUM_JOBS){
 			jobBuffer.push_back(job);
-			eventList.push_back(new jobArrival( jobArr(generator), getNewJob()));
+			eventList.push_back(new jobArrival( currTime+ jobArr(generator), getNewJob()));
 		}
 		// enqueue next job arrival event after calling expon
 		// cerr << "End\n";
