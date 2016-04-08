@@ -7,6 +7,7 @@
 #define NUM_CLIENTS 5
 #define NUM_JOBS 50
 #define CLIENT_BUFFER 5
+#define SERVER_BUFFER 10
 using namespace std;
 
 class event;
@@ -22,6 +23,7 @@ extern exponential_distribution<double> jobArr;
 extern int jobsCompleted;
 extern double deadlineSlack;
 extern double cpuWaste,cpuIdle;
+int jobsCreated=0;
 template <typename T> bool PComp(const T * const & a, const T * const & b)
 {
    return *a < *b;
@@ -83,7 +85,8 @@ public:
 				// Job complete 
 				cout<< fixed << setprecision(2) << currTime << " JobDoneAtClient " << c->current->id << " " << c->id <<endl;
 				c->removeJob(*(c->current));
-				c->current->id = -1;
+				free(c->current);
+				c->current=new jobs();
 				jobsCompleted++;
 				deadlineSlack += currTime-c->current->deadline;
 				if(currTime-c->current->deadline<0)
@@ -91,6 +94,7 @@ public:
 			}
 		}
 		for(int i=0;CLIENT_BUFFER-c->outReq>0;i++){
+			if(requestBuffer.size()>=SERVER_BUFFER)break;
 				requestBuffer.push_back(c);
 				c->outReq++;
 			}
@@ -98,7 +102,6 @@ public:
 			*(c->current) = c->getNextJob();
 		else
 			cpuIdle+=c->speed;
-
 
 		// add new timerInterrupt
 		eventList.push_back(new timerInterrupt(c, eventServiceTime + 1.0));
@@ -128,6 +131,7 @@ public:
 		// cerr << fixed << setprecision(2) << currTime << " Serving jobArrival " << job.id << endl;
 		// add job to server buffer
 		if(jobBuffer.size()<NUM_JOBS){
+			jobsCreated++;
 			job.spawnTime = currTime;
 			jobBuffer.push_back(job);
 			cout << fixed << setprecision(2) << currTime << " NewJobAtServer " << job.id << " " << job.timeNeeded 

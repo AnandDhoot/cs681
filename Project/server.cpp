@@ -55,13 +55,14 @@ default_random_engine generator (seed);
 	set_new_lambda(&clientSpeed, 0.1);
 
 	init();
-	int enthu=10000;
+	int enthu=1000000;
 	while(enthu){
 		eventList.front()->handle();
 		eventList.pop_front();
 		enthu--;
 	}
 	cout<<"# Jobs Completed : "<<jobsCompleted<<endl;
+	cout<<"# Jobs Created : "<<jobsCreated<<endl;
 	cout<<"# Deadline Slack : "<<deadlineSlack<<endl;
 	cout<<"# CPU Cycles Wasted : "<<cpuWaste<<endl;
 	cout<<"# CPU Cycles Idle : "<<cpuIdle<<endl;
