@@ -1,5 +1,5 @@
-#include <vector> 
-#include <list> 
+#include <vector>
+#include <list>
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
@@ -10,7 +10,7 @@ using namespace std;
 
 static int jobCount = 0;
 
-class jobs{
+class jobs {
 public:
 	int id;
 	double timeNeeded;		// Difference
@@ -42,6 +42,10 @@ public:
 	bool operator==(const jobs& b)
 	{
 		return this->id == b.id;
+	}
+		bool operator<(const jobs& b)
+	{
+		return this->deadline< b.deadline;
 	}
 };
 
