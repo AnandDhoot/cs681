@@ -2,14 +2,14 @@
 #include <list>
 #include <iostream>
 #include <iomanip>
-#include<algorithm>
+#include <algorithm>
 #include <math.h>
 #include "client.cpp"
-#define NUM_CLIENTS 5
-#define NUM_JOBS 50
-#define CLIENT_BUFFER 5
-#define SERVER_BUFFER 25
+int NUM_FIFO_Clients, NUM_FIFORR_Clients, NUM_SJF_Clients, NUM_SDF_Clients;
+int NUM_JOBS , CLIENT_BUFFER, SERVER_BUFFER;
+bool serverSJF, serverSDF, serverFastClient, serverFairClient;
 using namespace std;
+
 
 class event;
 
@@ -21,7 +21,7 @@ extern vector<Client*> requestBuffer;		// Server request buffer
 extern exponential_distribution<double> jobDuration;
 extern exponential_distribution<double> jobSlack;
 extern exponential_distribution<double> jobArr;
-extern int jobsCompleted;
+extern int jobsCompleted,jobsDropped;
 extern double deadlineSlack;
 extern double cpuWaste, cpuIdle;
 int jobsCreated = 0;
@@ -38,6 +38,14 @@ public:
 	bool operator<(const event& right) const
 	{ return eventServiceTime < right.eventServiceTime; }
 };
+bool fair( Client *a,  Client *b)
+{
+	return a->buffer.size() < b->buffer.size();
+}
+bool speed( Client *a,  Client *b)
+{
+	return *a < *b;
+}
 class serverInterrupt : public event {
 public:
 	serverInterrupt(double time) {
@@ -52,8 +60,12 @@ public:
 		eventList.push_back(new serverInterrupt(eventServiceTime + 0.1));
 		eventList.sort(PComp<event>);
 		//fastest server first
-		sort(requestBuffer.begin(),requestBuffer.end());
-		//cout<<"serverInterrupt "<<jobBuffer.size()<<" "<<requestBuffer.size()<<endl;
+		if (serverFastClient)
+			sort(requestBuffer.begin(), requestBuffer.end(), speed);
+		//fair scheduling
+		if (serverFairClient)
+			stable_sort(requestBuffer.begin(), requestBuffer.end(), fair);
+		//fout<<"serverInterrupt "<<jobBuffer.size()<<" "<<requestBuffer.size()<<endl;
 		while (requestBuffer[0]->buffer.size() >= CLIENT_BUFFER && requestBuffer.size() != 0) {
 			requestBuffer[0]->outReq--;
 			requestBuffer.erase(requestBuffer.begin());
@@ -61,7 +73,7 @@ public:
 		if (jobBuffer.size() == 0 || requestBuffer.size() == 0)
 			return;
 
-		cout << fixed << setprecision(2) << currTime << " JobToClient " << jobBuffer[0].id << " " << requestBuffer[0]->id << endl;
+		fout << fixed << setprecision(2) << currTime << " JobToClient " << jobBuffer[0].id << " " << requestBuffer[0]->id << endl;
 		requestBuffer[0]->buffer.push_back(jobBuffer[0]);
 		requestBuffer[0]->outReq--;
 		requestBuffer.erase(requestBuffer.begin());
@@ -80,7 +92,7 @@ public:
 	{
 		currTime = eventServiceTime;
 		// cerr << fixed << setprecision(2) << currTime << " Serving timerInterrupt "
-		//cout<< c->id << " " << c->outReq<< " "<<c->buffer.size() << " " << c->current->id<<" "<< endl;
+		//fout<< c->id << " " << c->outReq<< " "<<c->buffer.size() << " " << c->current->id<<" "<< endl;
 		double time = 1.0;
 		if (c->current->id != -1) {
 			c->current->runTime += c->speed;
@@ -88,9 +100,9 @@ public:
 			if (c->current->runTime >= c->current->timeNeeded && c->current->deadline > currTime)
 			{
 				// Job complete
-				cout << fixed << setprecision(2) << currTime << " JobDoneAtClient " << c->current->id << " " << c->id << endl;
+				fout << fixed << setprecision(2) << currTime << " JobDoneAtClient " << c->current->id << " " << c->id << endl;
 				jobsCompleted++;
-				deadlineSlack += currTime - c->current->deadline;
+				deadlineSlack += c->current->deadline - currTime ;
 				c->removeJob(*(c->current));
 				free(c->current);
 				c->current = new jobs();
@@ -98,10 +110,11 @@ public:
 			else if (c->current->deadline < currTime)
 			{
 				// Job Failed to complete before dedaline
-				cout << fixed << setprecision(2) << currTime << " JobDroppedAtClient " << c->current->id << " " << c->id << endl;
+				fout << fixed << setprecision(2) << currTime << " JobDroppedAtClient " << c->current->id << " " << c->id << endl;
 				cpuWaste += c->current->runTime;
 				c->removeJob(*(c->current));
 				free(c->current);
+				jobsDropped++;
 				c->current = new jobs();
 				//jobsCompleted++;
 				//deadlineSlack += currTime-c->current->deadline;
@@ -119,7 +132,7 @@ public:
 				break;
 			requestBuffer.push_back(c);
 			c->outReq++;
-			//cout<<"clientshizz "<<requestBuffer.size();
+			//fout<<"clientshizz "<<requestBuffer.size();
 		}
 		if (c->buffer.size() > 0)
 			*(c->current) = c->getNextJob();
@@ -156,9 +169,13 @@ public:
 			jobsCreated++;
 			job.spawnTime = currTime;
 			jobBuffer.push_back(job);
+			// SJF
+			if (serverSJF)
+				sort(jobBuffer.begin(), jobBuffer.end(), sjfComp);
 			//shortest deadline first
-			sort(jobBuffer.begin(),jobBuffer.end());
-			cout << fixed << setprecision(2) << currTime << " NewJobAtServer " << job.id << " " << job.timeNeeded
+			if (serverSDF)
+				sort(jobBuffer.begin(), jobBuffer.end());
+			fout << fixed << setprecision(2) << currTime << " NewJobAtServer " << job.id << " " << job.timeNeeded
 			     << " " << job.deadline << " " << job.spawnTime << endl;
 		}
 		eventList.push_back(new jobArrival(getNewJob(), currTime + jobArr(generator)));

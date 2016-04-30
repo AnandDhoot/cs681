@@ -1,11 +1,11 @@
 #include <vector>
 #include <list>
 #include <iostream>
-
+#include <fstream>
 #include "jobs.cpp"
 
 using namespace std;
-
+ofstream fout;
 exponential_distribution<double> clientSpeed;
 
 static int clientCount = 0;
@@ -25,7 +25,7 @@ public:
 		current = new jobs();
 	}
 
-	virtual jobs getNextJob() = 0;
+	virtual jobs getNextJob(){}
 	void removeJob(jobs job) {
 		buffer.remove(job);
 	}
@@ -40,7 +40,7 @@ class fifoRRClient : public Client {
 public:
 	fifoRRClient(int s) : Client(s)
 	{
-		cout << "NewClient " << "fifoRR " << id << " " << speed << endl;
+		fout << "NewClient " << "fifoRR " << id << " " << speed << endl;
 	}
 	jobs getNextJob()
 	{
@@ -59,7 +59,7 @@ class fifoClient : public Client {
 public:
 	fifoClient(int s) : Client(s)
 	{
-		cout << "NewClient " << "fifo " << id << " " << speed << endl;
+		fout << "NewClient " << "fifo " << id << " " << speed << endl;
 	}
 	jobs getNextJob()
 	{
@@ -72,7 +72,7 @@ class sdfClient : public Client {
 public:
 	sdfClient(int s) : Client(s)
 	{
-		cout << "NewClient " << "Shortest Deadline First " << id << " " << speed << endl;
+		fout << "NewClient " << "Shortest Deadline First " << id << " " << speed << endl;
 	}
 	jobs getNextJob()
 	{
@@ -90,7 +90,7 @@ class sjfClient : public Client {
 public:
 	sjfClient(int s) : Client(s)
 	{
-		cout << "NewClient " << "Shortest Job First " << id << " " << speed << endl;
+		fout << "NewClient " << "Shortest Job First " << id << " " << speed << endl;
 	}
 	jobs getNextJob()
 	{
