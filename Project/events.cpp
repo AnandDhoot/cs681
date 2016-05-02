@@ -7,6 +7,7 @@
 #include "client.cpp"
 int NUM_FIFO_Clients, NUM_FIFORR_Clients, NUM_SJF_Clients, NUM_SDF_Clients;
 int NUM_JOBS , CLIENT_BUFFER, SERVER_BUFFER;
+double serverInterruptDelay, clientInterruptDelay;
 bool serverSJF, serverSDF, serverFastClient, serverFairClient;
 using namespace std;
 
@@ -21,7 +22,7 @@ extern vector<Client*> requestBuffer;		// Server request buffer
 extern exponential_distribution<double> jobDuration;
 extern exponential_distribution<double> jobSlack;
 extern exponential_distribution<double> jobArr;
-extern int jobsCompleted,jobsDropped;
+extern int jobsCompleted, jobsDropped,jobsAccepted;
 extern double deadlineSlack;
 extern double cpuWaste, cpuIdle;
 int jobsCreated = 0;
@@ -57,7 +58,16 @@ public:
 		currTime = eventServiceTime;
 		// cerr << fixed << setprecision(2) << currTime << " Serving serverInterrupt" << endl;
 		//some algo
-		eventList.push_back(new serverInterrupt(eventServiceTime + 0.1));
+		//purge dead jobs
+		for (int i = 0; i < jobBuffer.size(); i++) {
+			if (currTime > jobBuffer[i].deadline) {
+				fout << fixed << setprecision(2) << currTime << " JobDroppedAtServer " <<jobBuffer[i].id << endl;
+				jobBuffer.erase(jobBuffer.begin() + i);
+				jobsDropped++;
+
+			}
+		}
+		eventList.push_back(new serverInterrupt(eventServiceTime + serverInterruptDelay));
 		eventList.sort(PComp<event>);
 		//fastest server first
 		if (serverFastClient)
@@ -95,7 +105,7 @@ public:
 		//fout<< c->id << " " << c->outReq<< " "<<c->buffer.size() << " " << c->current->id<<" "<< endl;
 		double time = 1.0;
 		if (c->current->id != -1) {
-			c->current->runTime += c->speed;
+			c->current->runTime += time * c->speed;
 
 			if (c->current->runTime >= c->current->timeNeeded && c->current->deadline > currTime)
 			{
@@ -116,8 +126,6 @@ public:
 				free(c->current);
 				jobsDropped++;
 				c->current = new jobs();
-				//jobsCompleted++;
-				//deadlineSlack += currTime-c->current->deadline;
 			}
 			else {
 				c->buffer.push_front(*(c->current));
@@ -132,7 +140,6 @@ public:
 				break;
 			requestBuffer.push_back(c);
 			c->outReq++;
-			//fout<<"clientshizz "<<requestBuffer.size();
 		}
 		if (c->buffer.size() > 0)
 			*(c->current) = c->getNextJob();
@@ -166,7 +173,6 @@ public:
 		// cerr << fixed << setprecision(2) << currTime << " Serving jobArrival " << job.id << endl;
 		// add job to server buffer
 		if (jobBuffer.size() < NUM_JOBS) {
-			jobsCreated++;
 			job.spawnTime = currTime;
 			jobBuffer.push_back(job);
 			// SJF
@@ -177,7 +183,9 @@ public:
 				sort(jobBuffer.begin(), jobBuffer.end());
 			fout << fixed << setprecision(2) << currTime << " NewJobAtServer " << job.id << " " << job.timeNeeded
 			     << " " << job.deadline << " " << job.spawnTime << endl;
+			     jobsAccepted++;
 		}
+		jobsCreated++;
 		eventList.push_back(new jobArrival(getNewJob(), currTime + jobArr(generator)));
 		eventList.sort(PComp<event>);
 		// enqueue next job arrival event after calling expon

@@ -6,7 +6,7 @@
 #include <chrono>
 #include <random>
 #include "events.cpp"
-#include <fstream>
+
 using namespace std;
 
 // --------------- <UTILS> ----------------
@@ -16,7 +16,7 @@ default_random_engine generator (seed);
 exponential_distribution<double> jobDuration;
 exponential_distribution<double> jobSlack;
 exponential_distribution<double> jobArr;
-int jobsCompleted = 0,jobsDropped=0;
+int jobsCompleted = 0, jobsDropped = 0,jobsAccepted=0;
 double deadlineSlack = 0;
 double cpuWaste = 0, cpuIdle = 0;
 
@@ -111,6 +111,12 @@ void parseParams() {
 	fin >> d;
 	set_new_lambda(&clientSpeed, d);
 	fin >> s;
+	fin >> d;
+	serverInterruptDelay = d;
+	fin >> s;
+	fin >> d;
+	clientInterruptDelay = d;
+	fin >> s;
 	fin >> simTime;
 }
 int main()
@@ -128,6 +134,7 @@ int main()
 	}
 	cout << "# Jobs Completed : " << jobsCompleted << endl;
 	cout << "# Jobs Dropped : " << jobsDropped << endl;
+	cout << "# Jobs Entered Server : " << jobsAccepted << endl;	
 	cout << "# Jobs Created : " << jobsCreated << endl;
 	cout << "# Deadline Slack : " << deadlineSlack << endl;
 	cout << "# CPU Cycles Wasted : " << cpuWaste << endl;
