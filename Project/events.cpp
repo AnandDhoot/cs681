@@ -57,7 +57,6 @@ public:
 	{
 		currTime = eventServiceTime;
 		// cerr << fixed << setprecision(2) << currTime << " Serving serverInterrupt" << endl;
-		//some algo
 		//purge dead jobs
 		for (int i = 0; i < jobBuffer.size(); i++) {
 			if (currTime > jobBuffer[i].deadline) {
@@ -103,7 +102,7 @@ public:
 		currTime = eventServiceTime;
 		// cerr << fixed << setprecision(2) << currTime << " Serving timerInterrupt "
 		//fout<< c->id << " " << c->outReq<< " "<<c->buffer.size() << " " << c->current->id<<" "<< endl;
-		double time = 1.0;
+		double time = clientInterruptDelay;
 		if (c->current->id != -1) {
 			c->current->runTime += time * c->speed;
 
@@ -133,7 +132,7 @@ public:
 			}
 		}
 		else
-			cpuIdle += c->speed;
+			cpuIdle += time*c->speed;
 
 		for (int i = 0; CLIENT_BUFFER - c->outReq - c->buffer.size() > 0; i++) {
 			if (requestBuffer.size() >= SERVER_BUFFER)
@@ -141,8 +140,10 @@ public:
 			requestBuffer.push_back(c);
 			c->outReq++;
 		}
-		if (c->buffer.size() > 0)
+		if (c->buffer.size() > 0){
 			*(c->current) = c->getNextJob();
+			 time = min(time, time * (c->current->timeNeeded - c->current->runTime) / c->speed);
+		}
 
 		// add new timerInterrupt
 
