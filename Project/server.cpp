@@ -18,7 +18,7 @@ exponential_distribution<double> jobSlack;
 exponential_distribution<double> jobArr;
 int jobsCompleted = 0, jobsDropped = 0,jobsAccepted=0;
 double deadlineSlack = 0;
-double cpuWaste = 0, cpuIdle = 0;
+double cpuWaste = 0, cpuIdle = 0, responseTimeCumm = 0;
 
 // To reset the exponential paramter
 template<typename T>
@@ -140,5 +140,6 @@ int main()
 	cout << "# CPU Cycles Wasted : " << cpuWaste << endl;
 	cout << "# CPU Cycles Idle : " << cpuIdle << endl;
 	cout << "# Total Time elapsed : " << currTime << endl;
+	cout << "Avg Response Time: " << 1.0*responseTimeCumm/jobsCompleted << endl;
 	return 1;
 }

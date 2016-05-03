@@ -23,7 +23,7 @@ extern exponential_distribution<double> jobDuration;
 extern exponential_distribution<double> jobSlack;
 extern exponential_distribution<double> jobArr;
 extern int jobsCompleted, jobsDropped,jobsAccepted;
-extern double deadlineSlack;
+extern double deadlineSlack, responseTimeCumm;
 extern double cpuWaste, cpuIdle;
 int jobsCreated = 0;
 template <typename T> bool PComp(const T * const & a, const T * const & b)
@@ -110,6 +110,7 @@ public:
 			{
 				// Job complete
 				fout << fixed << setprecision(2) << currTime << " JobDoneAtClient " << c->current->id << " " << c->id << endl;
+				responseTimeCumm += currTime - c->current->spawnTime;
 				jobsCompleted++;
 				deadlineSlack += c->current->deadline - currTime ;
 				c->removeJob(*(c->current));
