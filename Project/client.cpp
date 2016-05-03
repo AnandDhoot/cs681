@@ -77,6 +77,7 @@ public:
 	jobs getNextJob()
 	{
 		buffer.sort();
+
 		jobs temp = buffer.front();
 		buffer.pop_front();
 		return temp;

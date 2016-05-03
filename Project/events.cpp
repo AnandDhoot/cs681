@@ -23,7 +23,7 @@ extern exponential_distribution<double> jobDuration;
 extern exponential_distribution<double> jobSlack;
 extern exponential_distribution<double> jobArr;
 extern int jobsCompleted, jobsDropped,jobsAccepted;
-extern double deadlineSlack, responseTimeCumm;
+extern double deadlineSlack, responseTimeCumm, waitingTimeCumm;
 extern double cpuWaste, cpuIdle;
 int jobsCreated = 0;
 template <typename T> bool PComp(const T * const & a, const T * const & b)
@@ -70,7 +70,7 @@ public:
 		eventList.sort(PComp<event>);
 		//fastest server first
 		if (serverFastClient)
-			sort(requestBuffer.begin(), requestBuffer.end(), speed);
+			sort(requestBuffer.rbegin(), requestBuffer.rend(), speed);
 		//fair scheduling
 		if (serverFairClient)
 			stable_sort(requestBuffer.begin(), requestBuffer.end(), fair);
@@ -87,6 +87,10 @@ public:
 		requestBuffer[0]->outReq--;
 		requestBuffer.erase(requestBuffer.begin());
 		jobBuffer.erase(jobBuffer.begin());
+
+		// for(int i=0; i < requestBuffer.size(); i++)
+		// 	fout << requestBuffer[i]->id << " ";
+		// fout << endl;
 	}
 
 };
@@ -108,9 +112,10 @@ public:
 
 			if (c->current->runTime >= c->current->timeNeeded && c->current->deadline > currTime)
 			{
-				// Job complete
+				// Job complete1
 				fout << fixed << setprecision(2) << currTime << " JobDoneAtClient " << c->current->id << " " << c->id << endl;
 				responseTimeCumm += currTime - c->current->spawnTime;
+				waitingTimeCumm += currTime - c->current->spawnTime - c->current->timeNeeded;
 				jobsCompleted++;
 				deadlineSlack += c->current->deadline - currTime ;
 				c->removeJob(*(c->current));
@@ -182,14 +187,21 @@ public:
 				sort(jobBuffer.begin(), jobBuffer.end(), sjfComp);
 			//shortest deadline first
 			if (serverSDF)
+			{
 				sort(jobBuffer.begin(), jobBuffer.end());
+				// for(vector<jobs>::iterator it = jobBuffer.begin(); it != jobBuffer.end(); it++)
+				// 	cout << it->deadline << endl;
+				// cout << "--------------------------\n";
+			}
 			fout << fixed << setprecision(2) << currTime << " NewJobAtServer " << job.id << " " << job.timeNeeded
-			     << " " << job.deadline << " " << job.spawnTime << endl;
+			     << " " << job.deadline << endl;
 			     jobsAccepted++;
 		}
 		jobsCreated++;
 		eventList.push_back(new jobArrival(getNewJob(), currTime + jobArr(generator)));
 		eventList.sort(PComp<event>);
+
+
 		// enqueue next job arrival event after calling expon
 		// cerr << "End\n";
 	}
