@@ -1,7 +1,7 @@
 NUM_FIFO_Clients 0
 NUM_FIFORR_Clients 0
-NUM_SJF_Clients 0
-NUM_SDF_Clients 5 1 1 1 1 1
+NUM_SJF_Clients 5 1 1 1 1 1
+NUM_SDF_Clients 0
 Server_JOBS_Buffer 1000
 CLIENT_Jobs_BUFFER  5
 SERVER_Request_BUFFER 1500

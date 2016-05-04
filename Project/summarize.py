@@ -21,16 +21,16 @@ for line in f:
 for i in range(len(a)):
 	a[i] = a[i]/NUM_ITER
 
-# print('# Jobs Completed :', a[0])
-# print('# Jobs Dropped :', a[1])
-# print('# Jobs Entered Server :', a[2])
-# print('# Jobs Created :', a[3])
-# print('# Deadline Slack :', a[4])
-# print('# CPU Cycles Wasted :', a[5])
-# print('# CPU Cycles Idle :', a[6])
-# print('# Total Time elapsed :', a[7])
-# print('Avg Response Time :', a[8])
-# print('Avg Waiting Time :', a[9])
-# print()
+print('# Jobs Completed :', a[0])
+print('# Jobs Dropped :', a[1])
+print('# Jobs Entered Server :', a[2])
+print('# Jobs Created :', a[3])
+print('# Deadline Slack :', a[4])
+print('# CPU Cycles Wasted :', a[5])
+print('# CPU Cycles Idle :', a[6])
+print('# Total Time elapsed :', a[7])
+print('Avg Response Time :', a[8])
+print('Avg Waiting Time :', a[9])
+print()
 for x in a:
 	print(x, end="\t")
