@@ -5,7 +5,7 @@ NUM_SDF_Clients 5 1 1 1 1 1
 Server_JOBS_Buffer 10
 CLIENT_Jobs_BUFFER 5
 SERVER_Request_BUFFER 150
-serverSJF 1
+serverSJF 0
 serverSDF 0
 serverFastClient 0
 serverFairClient 1
