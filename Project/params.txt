@@ -5,14 +5,14 @@ NUM_SDF_Clients 5 1 1 1 1 1
 Server_JOBS_Buffer 10
 CLIENT_Jobs_BUFFER 5
 SERVER_Request_BUFFER 150
-serverSJF 0
+serverSJF 1
 serverSDF 0
 serverFastClient 0
 serverFairClient 1
 jobDuration_lambda 0.2
 jobSlack_lambda 0.05
-jobArrivalRate 20.0
+jobArrivalRate 10
 clientSpeed_lambda 0.75
 serverInterruptDelay 0.1 
 clientInterruptDelay 1
-SimTime 500
+SimTime 100

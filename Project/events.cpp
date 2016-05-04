@@ -75,18 +75,17 @@ public:
 		if (serverFairClient)
 			stable_sort(requestBuffer.begin(), requestBuffer.end(), fair);
 		//fout<<"serverInterrupt "<<jobBuffer.size()<<" "<<requestBuffer.size()<<endl;
+		while(jobBuffer.size() > 0 && requestBuffer.size() > 0){
 		while (requestBuffer[0]->buffer.size() >= CLIENT_BUFFER && requestBuffer.size() != 0) {
 			requestBuffer[0]->outReq--;
 			requestBuffer.erase(requestBuffer.begin());
 		}
-		if (jobBuffer.size() == 0 || requestBuffer.size() == 0)
-			return;
 
 		fout << fixed << setprecision(2) << currTime << " JobToClient " << jobBuffer[0].id << " " << requestBuffer[0]->id << endl;
 		requestBuffer[0]->buffer.push_back(jobBuffer[0]);
 		requestBuffer[0]->outReq--;
 		requestBuffer.erase(requestBuffer.begin());
-		jobBuffer.erase(jobBuffer.begin());
+		jobBuffer.erase(jobBuffer.begin());}
 
 		// for(int i=0; i < requestBuffer.size(); i++)
 		// 	fout << requestBuffer[i]->id << " ";
