@@ -160,28 +160,29 @@ int main()
 		eventList.front()->handle();
 		eventList.pop_front();
 	}
-	// cout << "# Jobs Completed : " << jobsCompleted << endl;
-	// cout << "# Jobs Dropped : " << jobsDropped << endl;
-	// cout << "# Jobs Entered Server : " << jobsAccepted << endl;	
-	// cout << "# Jobs Created : " << jobsCreated << endl;
-	// cout << "# Deadline Slack : " << deadlineSlack << endl;
-	// cout << "# CPU Cycles Wasted : " << cpuWaste << endl;
-	// cout << "# CPU Cycles Idle : " << cpuIdle << endl;
-	// cout << "# Total Time elapsed : " << currTime << endl;
-	// cout << "Avg Response Time: " << 1.0*responseTimeCumm/jobsCompleted << endl;
-	// cout << "Avg Waiting Time: " << 1.0*waitingTimeCumm/jobsCompleted << endl;
-	// cout << endl;
-
-	cout << jobsCompleted << endl;
-	cout << jobsDropped << endl;
-	cout << jobsAccepted << endl;	
-	cout << jobsCreated << endl;
-	cout << deadlineSlack << endl;
-	cout << cpuWaste << endl;
-	cout << cpuIdle << endl;
-	cout << currTime << endl;
-	cout << 1.0*responseTimeCumm/jobsCompleted << endl;
-	cout << 1.0*waitingTimeCumm/jobsCompleted << endl;
+	cout << "# Jobs Completed : " << jobsCompleted << endl;
+	cout << "# Jobs Dropped : " << jobsDropped << endl;
+	cout << "# Jobs Entered Server : " << jobsAccepted << endl;	
+	cout << "# Jobs Created : " << jobsCreated << endl;
+	cout << "# Deadline Slack : " << deadlineSlack << endl;
+	cout << "# CPU Cycles Wasted : " << cpuWaste << endl;
+	cout << "# CPU Cycles Idle : " << cpuIdle << endl;
+	cout << "# Total Time elapsed : " << currTime << endl;
+	cout << "Avg Response Time: " << 1.0*responseTimeCumm/jobsCompleted << endl;
+	cout << "Avg Waiting Time: " << 1.0*waitingTimeCumm/jobsCompleted << endl;
 	cout << endl;
+
+	// Uncomment this and comment the lines above if running the python script to summarize
+	// cout << jobsCompleted << endl;
+	// cout << jobsDropped << endl;
+	// cout << jobsAccepted << endl;	
+	// cout << jobsCreated << endl;
+	// cout << deadlineSlack << endl;
+	// cout << cpuWaste << endl;
+	// cout << cpuIdle << endl;
+	// cout << currTime << endl;
+	// cout << 1.0*responseTimeCumm/jobsCompleted << endl;
+	// cout << 1.0*waitingTimeCumm/jobsCompleted << endl;
+	// cout << endl;
 	return 1;
 }
