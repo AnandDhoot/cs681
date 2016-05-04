@@ -1,12 +1,12 @@
 NUM_FIFO_Clients 0
 NUM_FIFORR_Clients 0
-NUM_SJF_Clients 5 4 2 1 1 1
-NUM_SDF_Clients 0
+NUM_SJF_Clients 0
+NUM_SDF_Clients 5 4 2 1 1 1
 Server_JOBS_Buffer 10
 CLIENT_Jobs_BUFFER 5
 SERVER_Request_BUFFER 150
 serverSJF 0
-serverSDF 1
+serverSDF 0
 serverFastClient 0
 serverFairClient 1
 jobDuration_lambda 0.2
