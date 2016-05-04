@@ -12,5 +12,4 @@ echo -n " $i " >> out1.txt
 sed -i "s/jobArrivalRate.*/jobArrivalRate $i/" params.txt 
 python summarize.py >> out1.txt
 echo "" >> out1.txt
-echo "" >> out1.txt
 done;

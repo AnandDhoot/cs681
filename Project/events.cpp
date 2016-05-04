@@ -146,9 +146,18 @@ public:
 			requestBuffer.push_back(c);
 			c->outReq++;
 		}
-		if (c->buffer.size() > 0){
+		while (c->buffer.size() > 0){
 			*(c->current) = c->getNextJob();
+			if((c->current->deadline < currTime + ((c->current->timeNeeded - c->current->runTime)/c->speed))){
+				fout << fixed << setprecision(2) << currTime << " JobDroppedAtClient " << c->current->id << " " << c->id << endl;
+				jobsDropped++;
+				continue;
+			}
+			else{ 
+
 			 time = min(time, time * (c->current->timeNeeded - c->current->runTime) / c->speed);
+			 break;
+			}
 		}
 
 		// add new timerInterrupt
