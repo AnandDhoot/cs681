@@ -1,7 +1,7 @@
 NUM_FIFO_Clients 0
 NUM_FIFORR_Clients 0
 NUM_SJF_Clients 0
-NUM_SDF_Clients 5 4 2 1 1 1
+NUM_SDF_Clients 5 1 1 1 1 1
 Server_JOBS_Buffer 10
 CLIENT_Jobs_BUFFER 5
 SERVER_Request_BUFFER 150
@@ -15,4 +15,4 @@ jobArrivalRate 20.0
 clientSpeed_lambda 0.75
 serverInterruptDelay 0.1 
 clientInterruptDelay 1
-SimTime 50
+SimTime 500

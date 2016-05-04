@@ -121,8 +121,9 @@ public:
 				c->removeJob(*(c->current));
 				free(c->current);
 				c->current = new jobs();
+			// else if (c->current->deadline < currTime)
 			}
-			else if (c->current->deadline < currTime)
+			else if (c->current->deadline < currTime || (c->current->deadline < currTime + ((c->current->timeNeeded - c->current->runTime)/c->speed)))
 			{
 				// Job Failed to complete before dedaline
 				fout << fixed << setprecision(2) << currTime << " JobDroppedAtClient " << c->current->id << " " << c->id << endl;
